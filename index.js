@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "node:http";
 
 
-const port = Number(process.env.PORT) || 30001;
+const port = Number(process.env.PORT) || 3001;
 const app = express();
 
 const server = createServer(app);
