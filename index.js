@@ -24,7 +24,11 @@ io.on('connection', (socket) => {
 
     socket.on('message', (data) => {
         console.log(`message received:: ${data}`);
+        io.emit("incoming_msg", data);
+
+        // socket.broadcast.emit("incoming_msg", data);
     });
+
 
 
     socket.on('disconnect', () => {
