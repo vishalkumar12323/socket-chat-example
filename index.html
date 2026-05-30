@@ -76,7 +76,7 @@
 
         const form = document.getElementById('form');
         const input = document.getElementById('input');
-        const message = document.getElementById('messages');
+        const messages = document.getElementById('messages');
 
         form.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -88,6 +88,9 @@
 
         socket.on("incoming_msg", (data) => {
             console.log("User Received Data:: ", { data });
+            const messageList = document.createElement('li');
+            messageList.textContent = data;
+            messages.appendChild(messageList);
         });
     </script>
 </body>
