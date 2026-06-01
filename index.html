@@ -73,7 +73,11 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        const socket = io({
+            auth: {
+                serverOffset: 0
+            }
+        });
 
         const form = document.getElementById('form');
         const input = document.getElementById('input');
@@ -88,11 +92,13 @@
             }
         })
 
-        socket.on("chat_msg", (data) => {
-            console.log("User Received Data:: ", { data });
+        socket.on("chat_msg", (msg, serverOffset) => {
+            console.log("User Received Msg:: ", { msg });
             const messageList = document.createElement('li');
-            messageList.textContent = data;
+            messageList.textContent = msg;
             messages.appendChild(messageList);
+            window.scrollTo(0, document.body.scrollHeight);
+            socket.auth.serverOffset = serverOffset;
         });
 
         toggleBtn.addEventListener('click', (e) => {
