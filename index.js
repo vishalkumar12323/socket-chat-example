@@ -12,7 +12,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const server = createServer(app);
 
-const io = new Server(server)
+const io = new Server(server, {
+    connectionStateRecovery: {}
+})
 
 app.get("/", (req, res) => {
     res.sendFile(join(__dirname, "index.html"));
@@ -23,10 +25,10 @@ io.on('connection', (socket) => {
     console.log(`A new user connected:: ${socket.id}`);
 
     socket.on('message', (data) => {
-        console.log(`message received:: ${data}`);
-        // io.emit("incoming_msg", data);
+        // console.log(`message received:: ${data}`);
+        io.emit("chat_msg", data);
 
-        socket.broadcast.emit("incoming_msg", data);
+        // socket.broadcast.emit("chat_msg", data);
     });
 
 
