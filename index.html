@@ -37,13 +37,13 @@
         }
 
         #form>button {
-            background: #333;
+            background: #0057a2;
             border: none;
             padding: 0 1rem;
             margin: 0.25rem;
             border-radius: 3px;
             outline: none;
-            color: #fff;
+            color: #fefefe;
             cursor: pointer;
         }
 
@@ -86,7 +86,7 @@
             }
         })
 
-        socket.on("incoming_msg", (data) => {
+        socket.on("chat_msg", (data) => {
             console.log("User Received Data:: ", { data });
             const messageList = document.createElement('li');
             messageList.textContent = data;
