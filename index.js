@@ -9,7 +9,7 @@ import { open } from "sqlite";
 
 const db = await open({
     filename: 'chat.db',
-    dirname: sqlite3.Database
+    driver: sqlite3.Database
 });
 
 
@@ -19,7 +19,7 @@ await db.exec(`
             client_offset TEXT UNIQUE,
             content TEXT
         );
-    `)
+    `);
 
 const port = Number(process.env.PORT) || 3001;
 const app = express();
@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
 });
 
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     console.log(`A new user connected:: ${socket.id}`);
 
     socket.on('message', async (msg) => {
@@ -53,7 +53,18 @@ io.on('connection', (socket) => {
         // socket.broadcast.emit("chat_msg", data);
     });
 
-
+    if (!socket.recovered) {
+        try {
+            await db.each('SELECT (id, content) FROM messages WHERE id > ?', [socket.handshake.auth.serverOffset || 0], (err, row) => {
+                if (err) {
+                    console.log("Err:: ", err);
+                }
+                socket.emit("chat_msg", row.content, row.id)
+            })
+        } catch (err) {
+            console.log("Error::: ", err)
+        }
+    }
 
     socket.on('disconnect', () => {
         console.log(`User disconnected:: ${socket.id}`);
