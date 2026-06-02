@@ -1,9 +1,8 @@
 import { Pool } from "pg";
-
-const DATABASE_URL = process.env.DATABASE_URL || "postgresql://postgres:pgpassword@localhost:5432/mydb"
+import { env } from "./env.js";
 
 const pool = new Pool({
-    connectionString: DATABASE_URL
+    connectionString: env.DATABASE_URL
 });
 
 export { pool };

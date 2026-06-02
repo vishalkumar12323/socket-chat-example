@@ -3,23 +3,8 @@ import { createServer } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Server } from "socket.io";
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
+import { pool } from "./database"
 
-
-const db = await open({
-    filename: 'chat.db',
-    driver: sqlite3.Database
-});
-
-
-await db.exec(`
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            client_offset TEXT UNIQUE,
-            content TEXT
-        );
-    `);
 
 const port = Number(process.env.PORT) || 3001;
 const app = express();
