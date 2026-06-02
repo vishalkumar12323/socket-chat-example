@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Server } from "socket.io";
-import { pool } from "./database"
+import { pool } from "./database.js"
 
 
 const port = Number(process.env.PORT) || 3001;
@@ -28,24 +28,24 @@ io.on('connection', async (socket) => {
     socket.on('message', async (msg) => {
         let result;
         try {
-            result = await db.run('INSERT INTO messages (content) VALUES (?)', msg);
+            result = await pool.query('INSERT INTO messages (content) VALUES ($1) RETURNING id;', [msg]);
         } catch (err) {
             console.log("MSG INSERT ERR:: ", err);
             return;
         }
-        io.emit("chat_msg", msg, result.lastID);
+        console.log(result);
+        io.emit("chat_msg", msg, result.rows[0].id);
 
         // socket.broadcast.emit("chat_msg", data);
     });
 
     if (!socket.recovered) {
         try {
-            await db.each('SELECT (id, content) FROM messages WHERE id > ?', [socket.handshake.auth.serverOffset || 0], (err, row) => {
-                if (err) {
-                    console.log("Err:: ", err);
-                }
-                socket.emit("chat_msg", row.content, row.id)
-            })
+            const result = await pool.query(`SELECT id, content FROM messages WHERE id = 
+                $1;`, [socket.handshake.auth.serverOffset]);
+
+            if (result.rows.length === 0) return;
+            socket.emit('chat_msg', result.rows[0].content, result.rows[0].id);
         } catch (err) {
             console.log("Error::: ", err)
         }
