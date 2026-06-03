@@ -23,9 +23,13 @@ app.get("/", (req, res) => {
 
 
 io.on('connection', async (socket) => {
-    console.log(`A new user connected:: ${socket.id}`);
+
+    socket.on("new_usr", (username) => {
+        io.emit("user_connect", { username, id: socket.id });
+    })
 
     socket.on('message', async (msg) => {
+
         let result;
         try {
             result = await pool.query('INSERT INTO messages (content) VALUES ($1) RETURNING id;', [msg]);
