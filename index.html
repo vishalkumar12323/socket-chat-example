@@ -73,11 +73,14 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        const username = prompt("Please enter your profile name: ");
         const socket = io({
             auth: {
                 serverOffset: 0
             }
         });
+
+        socket.emit("new_usr", username);
 
         const form = document.getElementById('form');
         const input = document.getElementById('input');
@@ -99,6 +102,12 @@
             messages.appendChild(messageList);
             window.scrollTo(0, document.body.scrollHeight);
             socket.auth.serverOffset = serverOffset;
+        });
+
+        socket.on("user_connect", (data) => {
+            if (socket.id !== data.id) {
+                console.log(`user ${data.username} joined, userId: ${data.id}`);
+            }
         });
 
         toggleBtn.addEventListener('click', (e) => {
