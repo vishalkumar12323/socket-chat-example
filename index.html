@@ -4,63 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Socket.IO chat</title>
-    <style>
-        body {
-            margin: 0;
-            padding-bottom: 3rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        #form {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 0.25rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            height: 3rem;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
-        }
-
-        #input {
-            border: none;
-            padding: 0 1rem;
-            flex-grow: 1;
-            border-radius: 2rem;
-            margin: 0.25rem;
-        }
-
-        #input:focus {
-            outline: none;
-        }
-
-        #form>button {
-            background: #0057a2;
-            border: none;
-            padding: 0 1rem;
-            margin: 0.25rem;
-            border-radius: 3px;
-            outline: none;
-            color: #fefefe;
-            cursor: pointer;
-        }
-
-        #messages {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        #messages>li {
-            padding: 0.5rem 1rem;
-        }
-
-        #messages>li:nth-child(odd) {
-            background: #efefef;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/index.css">
 </head>
 
 <body>
@@ -70,57 +14,16 @@
         <button id="toggle-btn">Disconnect</button>
     </form>
 
+    <div class="pop_up">
+        <span>Vishal Joined Now!</span>
+        <button id="close_popup">
+            x
+        </button>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const username = prompt("Please enter your profile name: ");
-        const socket = io({
-            auth: {
-                serverOffset: 0
-            }
-        });
-
-        socket.emit("new_usr", username);
-
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
-        const messages = document.getElementById('messages');
-        const toggleBtn = document.getElementById('toggle-btn');
-
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit('message', input.value);
-                input.value = "";
-            }
-        })
-
-        socket.on("chat_msg", (msg, serverOffset) => {
-            console.log("User Received Msg:: ", { msg });
-            const messageList = document.createElement('li');
-            messageList.textContent = msg;
-            messages.appendChild(messageList);
-            window.scrollTo(0, document.body.scrollHeight);
-            socket.auth.serverOffset = serverOffset;
-        });
-
-        socket.on("user_connect", (data) => {
-            if (socket.id !== data.id) {
-                console.log(`user ${data.username} joined, userId: ${data.id}`);
-            }
-        });
-
-        toggleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (socket.connected) {
-                toggleBtn.textContent = "Connect";
-                socket.disconnect();
-            } else {
-                toggleBtn.textContent = "Disconnect";
-                socket.connect();
-            }
-        })
-    </script>
+    <script src="./scripts/index.js"></script>
+    <script src="./scripts/pop_up.js"></script>
 </body>
 
 </html>

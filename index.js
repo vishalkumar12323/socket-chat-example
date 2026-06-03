@@ -1,6 +1,6 @@
 import express from "express";
 import { createServer } from "node:http";
-import { dirname, join } from "node:path";
+import path, { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Server } from "socket.io";
 import { pool } from "./database.js"
@@ -11,6 +11,7 @@ const app = express();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+app.use(express.static(path.join(__dirname, "public")));
 const server = createServer(app);
 
 const io = new Server(server, {
@@ -37,7 +38,6 @@ io.on('connection', async (socket) => {
             console.log("MSG INSERT ERR:: ", err);
             return;
         }
-        console.log(result);
         io.emit("chat_msg", msg, result.rows[0].id);
 
         // socket.broadcast.emit("chat_msg", data);
