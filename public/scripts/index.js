@@ -19,6 +19,11 @@ const socket = io({
 
 socket.emit("new_usr", username);
 
+// re-announce our username when (re)connected so server updates online list
+socket.on('connect', () => {
+    socket.emit('new_usr', username);
+});
+
 function updateTypingIndicator() {
     const names = Array.from(typingUsers);
     if (names.length === 0) {
@@ -161,6 +166,10 @@ toggleBtn.addEventListener('click', (e) => {
     e.preventDefault();
     if (socket.connected) {
         toggleBtn.textContent = "Connect";
+        // remove ourselves from the local online list immediately
+        Array.from(onlineUsersList.children).forEach((li) => {
+            if (li.textContent === username) li.remove();
+        });
         socket.disconnect();
     } else {
         toggleBtn.textContent = "Disconnect";
