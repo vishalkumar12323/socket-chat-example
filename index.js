@@ -18,6 +18,8 @@ const io = new Server(server, {
     connectionStateRecovery: {}
 })
 
+const onlineUsers = new Map();
+
 app.get("/", (req, res) => {
     res.sendFile(join(__dirname, "index.html"));
 });
@@ -28,7 +30,9 @@ io.on('connection', async (socket) => {
     socket.on("new_usr", (username) => {
         const safeName = typeof username === 'string' && username.trim() ? username.trim() : 'Anonymous';
         socket.data.username = safeName;
+        onlineUsers.set(socket.id, safeName);
         io.emit("user_connect", { username: safeName, id: socket.id });
+        io.emit("user_list", Array.from(onlineUsers.values()));
     })
 
     socket.on('message', async (msg, ack) => {
@@ -49,6 +53,16 @@ io.on('connection', async (socket) => {
         socket.broadcast.emit("chat_msg", { content: msg, username, id: socket.id });
     });
 
+    socket.on('typing', () => {
+        const username = socket.data.username || 'Anonymous';
+        socket.broadcast.emit('user_typing', { username, id: socket.id });
+    });
+
+    socket.on('stop_typing', () => {
+        const username = socket.data.username || 'Anonymous';
+        socket.broadcast.emit('user_stop_typing', { username, id: socket.id });
+    });
+
     if (!socket.recovered) {
         try {
             const result = await pool.query(`SELECT id, content FROM messages WHERE id = 
@@ -62,7 +76,14 @@ io.on('connection', async (socket) => {
     }
 
     socket.on('disconnect', () => {
+        const username = socket.data.username;
         console.log(`User disconnected:: ${socket.id}`);
+
+        if (username) {
+            onlineUsers.delete(socket.id);
+            io.emit("user_list", Array.from(onlineUsers.values()));
+            socket.broadcast.emit('user_stop_typing', { username, id: socket.id });
+        }
     });
 });
 
