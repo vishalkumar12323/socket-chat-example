@@ -50,6 +50,51 @@ body {
     padding: 0.5rem 1rem;
 }
 
+#chat-status {
+    position: fixed;
+    bottom: 3.5rem;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    font-size: 0.9rem;
+}
+
+#typing-indicator {
+    color: #0057a2;
+}
+
+#online-status {
+    min-width: 180px;
+}
+
+#online-status strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+#online-users {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+#online-users li {
+    background: #0057a2;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+}
+
 #messages>li:nth-child(odd) {
     background: #efefef;
 }
