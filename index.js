@@ -26,21 +26,27 @@ app.get("/", (req, res) => {
 io.on('connection', async (socket) => {
 
     socket.on("new_usr", (username) => {
-        io.emit("user_connect", { username, id: socket.id });
+        const safeName = typeof username === 'string' && username.trim() ? username.trim() : 'Anonymous';
+        socket.data.username = safeName;
+        io.emit("user_connect", { username: safeName, id: socket.id });
     })
 
-    socket.on('message', async (msg) => {
-
+    socket.on('message', async (msg, ack) => {
+        const username = socket.data.username || 'Anonymous';
         let result;
         try {
             result = await pool.query('INSERT INTO messages (content) VALUES ($1) RETURNING id;', [msg]);
         } catch (err) {
             console.log("MSG INSERT ERR:: ", err);
+            if (typeof ack === 'function') ack(null);
             return;
         }
-        io.emit("chat_msg", msg, result.rows[0].id);
 
-        // socket.broadcast.emit("chat_msg", data);
+        if (typeof ack === 'function') {
+            ack(result.rows[0].id);
+        }
+
+        socket.broadcast.emit("chat_msg", { content: msg, username, id: socket.id });
     });
 
     if (!socket.recovered) {
