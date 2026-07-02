@@ -1,4 +1,4 @@
-# socket-chat-example
+# socket.io (simple chat interface)
 
 A simple real-time chat application built with Node.js, Express, Socket.IO, and PostgreSQL.
 
@@ -59,4 +59,4 @@ A simple real-time chat application built with Node.js, Express, Socket.IO, and 
 - The server serves static files from the `public` folder and handles Socket.IO events for chat interaction.
 
 ## License
-ISC
+MIT
